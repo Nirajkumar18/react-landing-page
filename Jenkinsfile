@@ -35,7 +35,13 @@ pipeline {
             steps {
                 withAWS(credentials: 'aws-access-key') {
                     script {
-                        s3Upload(bucket: 'sept4-bucket', file: 'dist.zip')
+                        try {
+                            s3Upload(bucket: 'sept4-bucket', file: 'dist.zip')
+                            echo "S3 upload completed successfully."
+                        } catch (e) {
+                            echo "S3 upload failed: ${e}"
+                            error("Failing pipeline due to S3 upload failure.")
+                        }
                     }
                 }
             }
@@ -45,21 +51,27 @@ pipeline {
             steps {
                 withAWS(credentials: 'aws-access-key') {
                     script {
-                        def deploymentId = awsCodeDeploy(
-                            applicationName: 'my-app',
-                            deploymentGroupName: 'myapp-deploy-grp',
-                            s3Location: [
-                                bucket: 'sept4-bucket',
-                                key: 'dist.zip',
-                                bundleType: 'zip'
-                            ]
-                        )
-                        echo "Deployment initiated with ID: ${deploymentId}"
+                        try {
+                            def deploymentId = awsCodeDeploy(
+                                applicationName: 'my-app',
+                                deploymentGroupName: 'myapp-deploy-grp',
+                                s3Location: [
+                                    bucket: 'sept4-bucket',
+                                    key: 'dist.zip',
+                                    bundleType: 'zip'
+                                ]
+                            )
+                            echo "Deployment initiated with ID: ${deploymentId}"
+                        } catch (e) {
+                            echo "CodeDeploy deployment failed: ${e}"
+                            error("Failing pipeline due to CodeDeploy failure.")
+                        }
                     }
                 }
             }
         }
     }
+
     post {
         always {
             cleanWs()
