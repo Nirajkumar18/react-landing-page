@@ -37,8 +37,7 @@ pipeline {
                     s3Upload(bucket: 'sept4-bucket', file: 'dist.zip')
                 }
             }
-        }
-        
+        }      
         stage('Deploy via CodeDeploy') {
             steps {
                 withAWS(credentials: 'aws-access-key') {
