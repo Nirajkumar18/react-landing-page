@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        AWS_ACCESS_KEY_ID = credentials('aws-access-key')  // This should be the ID of your AWS access key
-        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')  // This should be the ID of your AWS secret key
+        AWS_ACCESS_KEY_ID = credentials('aws-access-key')  // Use the correct ID for Access Key
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')  // Use the correct ID for Secret Key
     }
 
     stages {
@@ -12,7 +12,7 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/Nirajkumar18/react-landing-page.git'
             }
         }
-        
+
         stage('Install Dependencies') {
             steps {
                 sh 'npm install'
