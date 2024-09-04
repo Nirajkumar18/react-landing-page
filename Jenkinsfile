@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        AWS_ACCESS_KEY_ID = credentials('aws-access-key') 
-        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')  
+        AWS_ACCESS_KEY_ID = credentials('aws-access-key')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')
     }
 
     stages {
@@ -34,10 +34,13 @@ pipeline {
         stage('Upload to S3') {
             steps {
                 withAWS(credentials: 'aws-access-key') {
-                    s3Upload(bucket: 'sept4-bucket', file: 'dist.zip')
+                    script {
+                        s3Upload(bucket: 'sept4-bucket', file: 'dist.zip')
+                    }
                 }
             }
-        }      
+        }
+
         stage('Deploy via CodeDeploy') {
             steps {
                 withAWS(credentials: 'aws-access-key') {
@@ -55,6 +58,17 @@ pipeline {
                     }
                 }
             }
+        }
+    }
+    post {
+        always {
+            cleanWs()
+        }
+        failure {
+            echo 'The pipeline has failed!'
+        }
+        success {
+            echo 'Pipeline completed successfully!'
         }
     }
 }
