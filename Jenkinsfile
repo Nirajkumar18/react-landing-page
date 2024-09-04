@@ -33,7 +33,7 @@ pipeline {
 
         stage('Upload to S3') {
             steps {
-                withAWS(credentials: 'aws-access-key') {
+                withAWS(region: 'us-east-1', credentials: 'aws-credentials') {
                     script {
                         try {
                             s3Upload(bucket: 'sept4-bucket', file: 'dist.zip')
@@ -49,7 +49,7 @@ pipeline {
 
         stage('Deploy via CodeDeploy') {
             steps {
-                withAWS(credentials: 'aws-access-key') {
+                withAWS(region: 'us-east-1', credentials: 'aws-credentials') {
                     script {
                         try {
                             def deploymentId = awsCodeDeploy(
