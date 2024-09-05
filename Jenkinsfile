@@ -9,24 +9,28 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
+                // Clone code from the GitHub repository
                 git branch: 'main', url: 'https://github.com/Nirajkumar18/react-landing-page.git'
             }
         }
 
         stage('Install Dependencies') {
             steps {
+                // Install npm dependencies
                 sh 'npm install'
             }
         }
 
         stage('Build Application') {
             steps {
+                // Build the React application
                 sh 'npm run build'
             }
         }
 
         stage('Create Deployment Package') {
             steps {
+                // Create a zip package including build files and deployment scripts
                 sh 'zip -r dist.zip dist appspec.yml scripts'
             }
         }
@@ -34,6 +38,7 @@ pipeline {
         stage('Upload to S3') {
             steps {
                 withAWS(credentials: 'aws-access-key') {
+                    // Upload the deployment package to S3
                     s3Upload(bucket: 'sept4-bucket', file: 'dist.zip')
                 }
             }
@@ -42,7 +47,11 @@ pipeline {
         stage('Deploy via CodeDeploy') {
             steps {
                 withAWS(credentials: 'aws-access-key') {
+                    // Debugging output
+                    echo "Starting CodeDeploy with application name 'my-app' and deployment group 'myapp-deploy-grp'."
+                    
                     script {
+                        // Start the CodeDeploy deployment
                         def deploymentId = awsCodeDeploy(
                             applicationName: 'my-app',
                             deploymentGroupName: 'myapp-deploy-grp',
@@ -52,10 +61,21 @@ pipeline {
                                 bundleType: 'zip'
                             ]
                         )
+                        // Output the deployment ID for tracking
                         echo "Deployment initiated with ID: ${deploymentId}"
                     }
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            // Always archive the deployment package as an artifact
+            archiveArtifacts artifacts: 'dist.zip', allowEmptyArchive: true
+
+            // Optionally clean up workspace to avoid filling up Jenkins with files
+            cleanWs()
         }
     }
 }
