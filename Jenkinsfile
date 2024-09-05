@@ -46,11 +46,9 @@ pipeline {
                         createDeployment(
                             applicationName: 'my-app',
                             deploymentGroupName: 'myapp-deploy-grp',
-                            s3Location: [
-                                bucket: 'sept4-bucket',
-                                key: 'dist.zip',
-                                bundleType: 'zip'
-                            ]
+                            fileName: 'dist.zip',
+                            bucket: 'sept4-bucket',
+                            bundleType: 'zip'
                         )
                         echo "Deployment initiated."
                     }
