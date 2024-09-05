@@ -45,7 +45,7 @@ pipeline {
                     script {
                         def deploymentId = awsCodeDeploy(
                             applicationName: 'my-app',
-                            deploymentGroupName: 'myapp-deploy-grp',
+                            deploymentGroupName: 'deploy-grp',
                             s3Location: [
                                 bucket: 'sept4-bucket',
                                 key: 'dist.zip',
