@@ -45,10 +45,13 @@ pipeline {
                     createDeployment(
                         applicationName: 'my-app',
                         deploymentGroupName: 'myapp-deploy-grp',
-                        s3Location: [
-                            bucket: 'sept4-bucket',
-                            key: 'dist.zip',
-                            bundleType: 'zip'
+                        revision: [
+                            revisionType: 'S3',
+                            s3Location: [
+                                bucket: 'sept4-bucket',
+                                key: 'dist.zip',
+                                bundleType: 'zip'
+                            ]
                         ]
                     )
                 }
