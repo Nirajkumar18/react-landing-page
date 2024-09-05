@@ -31,6 +31,14 @@ pipeline {
             }
         }
 
+        stage('Clean Server Directory') {
+            steps {
+                sh '''
+                ssh ec2-user@<your-server-ip> "sudo rm -rf /var/www/html/nike-landing-page-react/*"
+                '''
+            }
+        }
+
         stage('Upload to S3') {
             steps {
                 withAWS(credentials: 'aws-access-key') {
@@ -42,16 +50,18 @@ pipeline {
         stage('Deploy via CodeDeploy') {
             steps {
                 withAWS(credentials: 'aws-access-key') {
-                    createDeployment(
-                        applicationName: 'my-app',
-                        deploymentGroupName: 'myapp-deploy-grp',
-                        s3Location: [
-                            bucket: 'sept4-bucket',
-                            key: 'dist.zip',
-                            bundleType: 'zip'
-                        ]
-                    )
-                    echo "Deployment initiated."
+                    script {
+                        def deploymentId = awsCodeDeploy(
+                            applicationName: 'my-app',
+                            deploymentGroupName: 'myapp-deploy-grp',
+                            s3Location: [
+                                bucket: 'sept4-bucket',
+                                key: 'dist.zip',
+                                bundleType: 'zip'
+                            ]
+                        )
+                        echo "Deployment initiated with ID: ${deploymentId}"
+                    }
                 }
             }
         }
