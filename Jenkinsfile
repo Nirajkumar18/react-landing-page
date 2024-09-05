@@ -31,14 +31,6 @@ pipeline {
             }
         }
 
-        stage('Clean Server Directory') {
-            steps {
-                sh '''
-                ssh ec2-user@<your-server-ip> "sudo rm -rf /var/www/html/nike-landing-page-react/*"
-                '''
-            }
-        }
-
         stage('Upload to S3') {
             steps {
                 withAWS(credentials: 'aws-access-key') {
