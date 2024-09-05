@@ -33,7 +33,7 @@ pipeline {
 
         stage('Upload to S3') {
             steps {
-                withAWS(credentials: 'aws-access-key', region: 'us-east-1') {
+                withAWS(credentials: 'aws-access-key') {
                     s3Upload(bucket: 'sept4-bucket', file: 'dist.zip')
                 }
             }
@@ -41,9 +41,8 @@ pipeline {
 
         stage('Deploy via CodeDeploy') {
             steps {
-                withAWS(credentials: 'aws-access-key', region: 'us-east-1') {
+                withAWS(credentials: 'aws-access-key') {
                     script {
-                        echo "Initiating CodeDeploy deployment..."
                         def deploymentId = awsCodeDeploy(
                             applicationName: 'my-app',
                             deploymentGroupName: 'myapp-deploy-grp',
@@ -54,23 +53,9 @@ pipeline {
                             ]
                         )
                         echo "Deployment initiated with ID: ${deploymentId}"
-
-                        // Check deployment status using AWS CLI
-                        sh "aws deploy get-deployment --deployment-id ${deploymentId} --region us-east-1"
                     }
                 }
             }
-        }
-    }
-
-    post {
-        success {
-            echo "Deployment completed successfully."
-        }
-
-        failure {
-            echo "Deployment failed. Checking logs..."
-            // Optionally, add commands to fetch logs or diagnose failure
         }
     }
 }
