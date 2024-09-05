@@ -4,6 +4,7 @@ pipeline {
     environment {
         AWS_ACCESS_KEY_ID = credentials('aws-access-key')
         AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')
+        AWS_DEFAULT_REGION = 'us-east-1' // Replace with your region
     }
 
     stages {
@@ -47,22 +48,15 @@ pipeline {
         stage('Deploy via CodeDeploy') {
             steps {
                 withAWS(credentials: 'aws-access-key') {
-                    // Debugging output
-                    echo "Starting CodeDeploy with application name 'my-app' and deployment group 'myapp-deploy-grp'."
-                    
                     script {
-                        // Start the CodeDeploy deployment
-                        def deploymentId = awsCodeDeploy(
-                            applicationName: 'my-app',
-                            deploymentGroupName: 'myapp-deploy-grp',
-                            s3Location: [
-                                bucket: 'sept4-bucket',
-                                key: 'dist.zip',
-                                bundleType: 'zip'
-                            ]
-                        )
-                        // Output the deployment ID for tracking
-                        echo "Deployment initiated with ID: ${deploymentId}"
+                        // Start CodeDeploy via AWS CLI
+                        sh '''
+                            aws deploy create-deployment \
+                                --application-name my-app \
+                                --deployment-group-name myapp-deploy-grp \
+                                --s3-location bucket=sept4-bucket,key=dist.zip,bundleType=zip \
+                                --file-exists-behavior OVERWRITE
+                        '''
                     }
                 }
             }
