@@ -53,7 +53,7 @@ pipeline {
                         sh '''
                             aws deploy create-deployment \
                                 --application-name my-app \
-                                --deployment-group-name myapp-deploy-grp \
+                                --deployment-group-name deploy-grp \
                                 --s3-location bucket=sept4-bucket,key=dist.zip,bundleType=zip \
                                 --file-exists-behavior OVERWRITE
                         '''
