@@ -42,18 +42,18 @@ pipeline {
         stage('Deploy via CodeDeploy') {
             steps {
                 withAWS(credentials: 'aws-access-key') {
-                    createDeployment(
-                        applicationName: 'my-app',
-                        deploymentGroupName: 'myapp-deploy-grp',
-                        revision: [
-                            revisionType: 'S3',
+                    script {
+                        def deploymentId = awsCodeDeploy(
+                            applicationName: 'my-app',
+                            deploymentGroupName: 'myapp-deploy-grp',
                             s3Location: [
                                 bucket: 'sept4-bucket',
                                 key: 'dist.zip',
                                 bundleType: 'zip'
                             ]
-                        ]
-                    )
+                        )
+                        echo "Deployment initiated with ID: ${deploymentId}"
+                    }
                 }
             }
         }
